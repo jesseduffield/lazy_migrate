@@ -21,11 +21,11 @@ module LazyMigrate
     end
 
     def migrate(migration)
-      # unimplemented
+      ActiveRecord::Migrator.migrate(base_paths, migration[:version])
     end
 
     def rollback(migration)
-      # unimplemented
+      ActiveRecord::Migrator.migrate(base_paths, migration[:version])
     end
 
     def find_filename_for_migration(migration)

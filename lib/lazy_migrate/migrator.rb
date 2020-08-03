@@ -39,14 +39,24 @@ module LazyMigrate
       private
 
       def find_migrations(migration_adapter)
+        current_version = migration_adapter.last_version
+
         migration_adapter.find_migration_tuples
           .reverse
-          .map { |status, version, name|
+          .map { |status, str_version, name|
             # This depends on how rails reports a file is missing.
             # This is no doubt subject to change so be wary.
             has_file = name != '********** NO FILE **********'
+            version = str_version.to_i
+            current = version == current_version
 
-            { status: status, version: version.to_i, name: name, has_file: has_file }
+            {
+              status: status,
+              version: version,
+              name: name,
+              has_file: has_file,
+              current: current,
+            }
           }
       end
 
@@ -134,7 +144,7 @@ module LazyMigrate
       end
 
       def render_migration_option(migration)
-        "#{migration[:status].ljust(6)}#{migration[:version].to_s.ljust(16)}#{migration[:name].ljust(50)}"
+        "#{migration[:status].ljust(6)}#{migration[:version].to_s.ljust(16)}#{migration[:name].ljust(50)}#{(migration[:current] ? '(current)' : '').ljust(100)}"
       end
 
       # bring_to_top updates the version of a migration to bring it to the top of the
