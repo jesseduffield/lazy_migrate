@@ -16,16 +16,7 @@ module LazyMigrate
       REDO = 'redo'
       BRING_TO_TOP = 'bring to top'
 
-      def create_migration_adapter
-        if Rails.version > '5.2.0'
-          LazyMigrate::NewMigrationAdapter.new
-        else
-          LazyMigrate::OldMigrationAdapater.new
-        end
-      end
-
       def run
-        puts 'running in new way'
         migration_adapter = create_migration_adapter
 
         loop do
@@ -46,6 +37,20 @@ module LazyMigrate
       end
 
       private
+
+      def create_migration_adapter
+        if Rails.version > '5.2.0'
+          LazyMigrate::NewMigrationAdapter.new
+        else
+          LazyMigrate::OldMigrationAdapater.new
+        end
+      end
+
+      def load_migration_paths
+        ActiveRecord::Migrator.migrations_paths.each do |path|
+          Dir[Rails.application.root.join("#{path}/**/*.rb")].each { |file| load file }
+        end
+      end
 
       def select_migration_prompt(prompt:, migrations:, on_done:, migration_adapter:)
         prompt.select('Pick a migration') do |menu|
@@ -99,12 +104,6 @@ module LazyMigrate
           [UP]
         end
         specific_options + common_options
-      end
-
-      def load_migration_paths
-        ActiveRecord::Migrator.migrations_paths.each do |path|
-          Dir[Rails.application.root.join("#{path}/**/*.rb")].each { |file| load file }
-        end
       end
 
       def obtain_option_map(migration_adapter:)
