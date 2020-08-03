@@ -1,4 +1,17 @@
 #!/usr/bin/env ruby
+# frozen_string_literal: true
 
+until File.exist?('Gemfile')
+  Dir.chdir('..')
+
+  if File.dirname(__FILE__) == __FILE__
+    puts "Must be run in a rails project"
+    exit
+  end
+end
+
+require './config/environment'
+# require File.expand_path('./config/environment')
 require 'lazy_migrate'
+
 LazyMigrate.run
