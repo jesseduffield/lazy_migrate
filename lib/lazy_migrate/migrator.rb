@@ -144,7 +144,15 @@ module LazyMigrate
       end
 
       def render_migration_option(migration)
-        "#{migration[:status].ljust(6)}#{migration[:version].to_s.ljust(16)}#{migration[:name].ljust(50)}#{(migration[:current] ? '(current)' : '').ljust(100)}"
+        "#{
+          migration[:status].ljust(6)
+        }#{
+          migration[:version].to_s.ljust(16)
+        }#{
+          migration[:name].ljust(50)
+        }#{
+          (migration[:current] ? '(current)' : '').ljust(12)
+        }"
       end
 
       # bring_to_top updates the version of a migration to bring it to the top of the
