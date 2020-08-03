@@ -57,7 +57,7 @@ module LazyMigrate
 
       return nil if version == versions.first
 
-      previous_value(values, version)
+      previous_value(versions, version)
     end
 
     # TODO: consider combining code with that from old_migration_adapter.rb
