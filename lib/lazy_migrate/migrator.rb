@@ -47,7 +47,7 @@ module LazyMigrate
 
       private
 
-      def select_migration_prompt(prompt:, migrations:, on_done:)
+      def select_migration_prompt(prompt:, migrations:, on_done:, migration_adapter:)
         prompt.select('Pick a migration') do |menu|
           migrations.each { |migration|
             name = render_migration_option(migration)
