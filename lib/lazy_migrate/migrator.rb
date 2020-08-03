@@ -3,6 +3,8 @@
 require 'tty-prompt'
 require 'active_record'
 require 'rails'
+require "lazy_migrate/old_migration_adapter"
+require "lazy_migrate/new_migration_adapter"
 
 module LazyMigrate
   class Migrator
