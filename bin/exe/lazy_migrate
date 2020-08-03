@@ -12,7 +12,6 @@ until File.exist?('Gemfile')
 end
 
 require './config/environment'
-# require File.expand_path('./config/environment')
 require 'lazy_migrate'
 
 LazyMigrate.run
