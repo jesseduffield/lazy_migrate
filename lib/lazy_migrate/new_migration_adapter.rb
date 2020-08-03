@@ -5,20 +5,14 @@ module LazyMigrate
     attr_accessor :context
 
     def initialize
+      # TODO: consider making this a method rather than an instance variable
+      # considering how cheap it is to obtain
       @context = ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate'))
     end
 
-    def find_migrations
-      migration_tuples = context.migrations_status
-      migration_tuples
-        .reverse
-        .map { |status, version, name|
-          # This depends on how rails reports a file is missing.
-          # This is no doubt subject to change so be wary.
-          has_file = name != '********** NO FILE **********'
-
-          { status: status, version: version.to_i, name: name, has_file: has_file }
-        }
+    # example: ['up', 20200715030339, 'Add unique index to table']
+    def find_migration_tuples
+      context.migrations_status
     end
 
     def up(migration)

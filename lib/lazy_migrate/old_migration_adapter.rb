@@ -2,17 +2,9 @@
 
 module LazyMigrate
   class OldMigrationAdapater
-    def find_migrations
-      migrations_tuples = ActiveRecord::Migrator.migrations_status(base_paths)
-      migrations_tuples
-        .reverse
-        .map { |status, version, name| # TODO: consider factoring this out
-          # This depends on how rails reports a file is missing.
-          # This is no doubt subject to change so be wary.
-          has_file = name != '********** NO FILE **********'
-
-          { status: status, version: version.to_i, name: name, has_file: has_file }
-        }
+    # example: ['up', 20200715030339, 'Add unique index to table']
+    def find_migration_tuples
+      ActiveRecord::Migrator.migrations_status(base_paths)
     end
 
     def up(migration)

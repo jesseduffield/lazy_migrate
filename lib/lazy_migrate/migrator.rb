@@ -24,7 +24,7 @@ module LazyMigrate
             on_done = -> { throw :done }
 
             load_migration_paths
-            migrations = migration_adapter.find_migrations
+            migrations = find_migrations(migration_adapter)
 
             prompt = TTY::Prompt.new(active_color: :bright_green)
             prompt.ok("\nDatabase: #{ActiveRecord::Base.connection_config[:database]}\n")
@@ -38,6 +38,18 @@ module LazyMigrate
 
       private
 
+      def find_migrations(migration_adapter)
+        migration_adapter.find_migration_tuples
+          .reverse
+          .map { |status, version, name|
+            # This depends on how rails reports a file is missing.
+            # This is no doubt subject to change so be wary.
+            has_file = name != '********** NO FILE **********'
+
+            { status: status, version: version.to_i, name: name, has_file: has_file }
+          }
+      end
+
       def create_migration_adapter
         if Rails.version > '5.2.0'
           LazyMigrate::NewMigrationAdapter.new
@@ -47,8 +59,12 @@ module LazyMigrate
       end
 
       def load_migration_paths
-        ActiveRecord::Migrator.migrations_paths.each do |path|
-          Dir[Rails.application.root.join("#{path}/**/*.rb")].each { |file| load file }
+        # silencing cos we might be re-initializing some constants and rails
+        # doesn't like that
+        Kernel.silence_warnings do
+          ActiveRecord::Migrator.migrations_paths.each do |path|
+            Dir[Rails.application.root.join("#{path}/**/*.rb")].each { |file| load file }
+          end
         end
       end
 
