@@ -53,7 +53,7 @@ module LazyMigrate
     end
 
     def find_previous_version(version)
-      versions = ActiveRecord::Migrator.get_all_versions
+      versions = context.migrations.map(&:version)
 
       return nil if version == versions.first
 
