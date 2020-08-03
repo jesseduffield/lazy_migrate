@@ -23,6 +23,7 @@ module LazyMigrate
       end
 
       def run
+        puts 'running in new way'
         migration_adapter = create_migration_adapter
 
         loop do
