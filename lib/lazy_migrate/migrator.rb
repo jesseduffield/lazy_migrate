@@ -14,18 +14,28 @@ module LazyMigrate
       REDO = 'redo'
       BRING_TO_TOP = 'bring to top'
 
+      def create_migration_adapter
+        if Rails.version > '5.2.0'
+          NewMigrationAdapter.new
+        else
+          OldMigrationAdapater.new
+        end
+      end
+
       def run
+        migration_adapter = create_migration_adapter
+
         loop do
           catch(:done) do
             on_done = -> { throw :done }
 
             load_migration_paths
-            migrations = find_migrations
+            migrations = migration_adapter.find_migrations
 
             prompt = TTY::Prompt.new(active_color: :bright_green)
             prompt.ok("\nDatabase: #{ActiveRecord::Base.connection_config[:database]}\n")
 
-            select_migration_prompt(prompt: prompt, migrations: migrations, on_done: on_done)
+            select_migration_prompt(prompt: prompt, migrations: migrations, on_done: on_done, migration_adapter: migration_adapter)
           end
         end
       rescue TTY::Reader::InputInterrupt
@@ -45,7 +55,7 @@ module LazyMigrate
                 select_action_prompt(
                   on_done: on_done,
                   prompt: prompt,
-                  context: context,
+                  migration_adapter: migration_adapter,
                   migration: migration,
                 )
               }
@@ -54,14 +64,14 @@ module LazyMigrate
         end
       end
 
-      def select_action_prompt(on_done:, context:, prompt:, migration:)
+      def select_action_prompt(on_done:, migration_adapter:, prompt:, migration:)
         if !migration[:has_file]
           prompt.error("\nMigration file not found for migration #{migration[:version]}")
           prompt_any_key(prompt)
           on_done.()
         end
 
-        option_map = obtain_option_map(context: context)
+        option_map = obtain_option_map(migration_adapter: migration_adapter)
 
         prompt.select("\nWhat would you like to do for #{migration[:version]} #{name}?") do |inner_menu|
           options_for_migration(status: migration[:status]).each do |option|
@@ -88,42 +98,21 @@ module LazyMigrate
         specific_options + common_options
       end
 
-      def obtain_option_map(context:)
-        {
-          UP => ->(migration) { context.run(:up, migration[:version]) },
-          DOWN => ->(migration) { context.run(:down, migration[:version]) },
-          REDO => ->(migration) {
-            context.run(:down, migration[:version])
-            context.run(:up, migration[:version])
-          },
-          MIGRATE => ->(migration) { context.up(migration[:version]) },
-          ROLLBACK => ->(migration) {
-            # for some reason in https://github.com/rails/rails/blob/5-2-stable/activerecord/lib/active_record/migration.rb#L1221
-            # we stop before the selected version. I have no idea why.
-            # I could override the logic here but it wouldn't
-            # work when trying to rollback the final migration.
-            context.down(migration[:version])
-          },
-          BRING_TO_TOP => ->(migration) { bring_to_top(migration) },
-        }
-      end
-
       def load_migration_paths
         ActiveRecord::Migrator.migrations_paths.each do |path|
           Dir[Rails.application.root.join("#{path}/**/*.rb")].each { |file| load file }
         end
       end
 
-      def find_migrations
-        context.migrations_status
-          .reverse
-          .map { |status, version, name|
-            # This depends on how rails reports a file is missing.
-            # This is no doubt subject to change so be wary.
-            has_file = name != '********** NO FILE **********'
-
-            { status: status, version: version.to_i, name: name, has_file: has_file }
-          }
+      def obtain_option_map(migration_adapter:)
+        {
+          UP => ->(migration) { migration_adapter.up(migration) },
+          DOWN => ->(migration) { migration_adapter.down(migration) },
+          REDO => ->(migration) { migration_adapter.redo(migration) },
+          MIGRATE => ->(migration) { migration_adapter.migrate(migration) },
+          ROLLBACK => ->(migration) { migration_adapter.rollback(migration) },
+          BRING_TO_TOP => ->(migration) { bring_to_top(migration: migration, migration_adapter: migration_adapter) },
+        }
       end
 
       def render_migration_option(migration)
@@ -134,14 +123,14 @@ module LazyMigrate
       # migration list. If the migration had already been up'd it will mark the
       # new migration file as upped as well. The former version number will be
       # removed from the schema_migrations table.
-      def bring_to_top(migration)
-        filename = context.migrations.find { |m| m.version == migration[:version] }&.filename
+      def bring_to_top(migration:, migration_adapter:)
+        filename = migration_adapter.find_filename_for_migration(migration)
 
         if filename.nil?
           raise("No file found for migration #{migration[:version]}")
         end
 
-        last = last_version
+        last = migration_adapter.last_version
         new_version = ActiveRecord::Migration.next_migration_number(last ? last + 1 : 0)
 
         # replace the version
@@ -159,10 +148,6 @@ module LazyMigrate
         ActiveRecord::SchemaMigration.find_by(version: migration[:version])&.destroy!
       end
 
-      def last_version
-        context.migrations.last&.version
-      end
-
       def prompt_any_key(prompt)
         prompt.keypress("\nPress any key to continue")
       end
@@ -172,10 +157,6 @@ module LazyMigrate
       rescue Exception => e # rubocop:disable Lint/RescueException
         # I am aware you should not rescue 'Exception' exceptions but I think this is is an 'exceptional' use case
         puts "\n#{e.class}: #{e.message}\n#{e.backtrace.take(5).join("\n")}"
-      end
-
-      def context
-        ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate'))
       end
     end
   end
