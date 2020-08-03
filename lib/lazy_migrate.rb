@@ -1,6 +1,10 @@
+# frozen_string_literal: true
+
 require "lazy_migrate/version"
+require "lazy_migrate/migrator"
 
 module LazyMigrate
-  class Error < StandardError; end
-  # Your code goes here...
+  def self.run
+    Migrator.run
+  end
 end
