@@ -3,8 +3,7 @@
 require 'tty-prompt'
 require 'active_record'
 require 'rails'
-require "lazy_migrate/old_migration_adapter"
-require "lazy_migrate/new_migration_adapter"
+require "lazy_migrate/migration_adapter_factory"
 
 module LazyMigrate
   class Migrator
@@ -17,7 +16,7 @@ module LazyMigrate
       BRING_TO_TOP = 'bring to top'
 
       def run
-        migration_adapter = create_migration_adapter
+        migration_adapter = MigrationAdapterFactory.create_migration_adapter
 
         loop do
           catch(:done) do
@@ -58,14 +57,6 @@ module LazyMigrate
               current: current,
             }
           }
-      end
-
-      def create_migration_adapter
-        if Rails.version > '5.2.0'
-          LazyMigrate::NewMigrationAdapter.new
-        else
-          LazyMigrate::OldMigrationAdapater.new
-        end
       end
 
       def load_migration_paths

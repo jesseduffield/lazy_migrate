@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require 'lazy_migrate/common'
+
 module LazyMigrate
   class OldMigrationAdapater
+    include LazyMigrate::Common
+
     # example: ['up', 20200715030339, 'Add unique index to table']
     def find_migration_tuples
       ActiveRecord::Migrator.migrations_status(base_paths)
@@ -52,11 +56,6 @@ module LazyMigrate
       return nil if version == versions.first
 
       previous_value(versions, version)
-    end
-
-    # TODO: consider combining code with that from old_migration_adapter.rb
-    def previous_value(arr, value)
-      arr.sort.select { |v| v < value }.last
     end
 
     def base_paths

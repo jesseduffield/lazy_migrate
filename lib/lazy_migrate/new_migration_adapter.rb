@@ -1,7 +1,11 @@
 # frozen_string_literal: true
 
+require 'lazy_migrate/common'
+
 module LazyMigrate
   class NewMigrationAdapter
+    include LazyMigrate::Common
+
     attr_accessor :context
 
     def initialize
@@ -35,12 +39,7 @@ module LazyMigrate
     def rollback(migration)
       # for some reason in https://github.com/rails/rails/blob/5-2-stable/activerecord/lib/active_record/migration.rb#L1221
       # we stop before the selected version. I have no idea why.
-      # I could override the logic here but it wouldn't
-      # work when trying to rollback the final migration.
-      context.down(migration[:version])
-    end
 
-    def rollback(migration)
       previous_version = find_previous_version(migration[:version])
 
       if previous_version.nil?
@@ -58,11 +57,6 @@ module LazyMigrate
       return nil if version == versions.first
 
       previous_value(versions, version)
-    end
-
-    # TODO: consider combining code with that from old_migration_adapter.rb
-    def previous_value(arr, value)
-      arr.sort.select { |v| v < value }.last
     end
 
     def find_filename_for_migration(migration)
