@@ -25,7 +25,7 @@ module LazyMigrate
     end
 
     def rollback(migration)
-      previous_version = find_previous_version(version)
+      previous_version = find_previous_version(migration[:version])
 
       if previous_version.nil?
         # rails excludes the given version when calling .migrate so we need to
