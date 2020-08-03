@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    lazy_migrate (0.1.0)
-      tty-prompt
+    lazy_migrate (0.1.5)
+      tty-prompt (~> 0.22.0)
 
 GEM
   remote: https://rubygems.org/
