@@ -25,7 +25,15 @@ module LazyMigrate
     end
 
     def rollback(migration)
-      ActiveRecord::Migrator.migrate(base_paths, migration[:version])
+      previous_version = find_previous_version(version)
+
+      if previous_version.nil?
+        # rails excludes the given version when calling .migrate so we need to
+        # just down this instead
+        down(migration)
+      else
+        ActiveRecord::Migrator.migrate(base_paths, previous_version)
+      end
     end
 
     def find_filename_for_migration(migration)
@@ -37,6 +45,19 @@ module LazyMigrate
     end
 
     private
+
+    def find_previous_version(version)
+      versions = ActiveRecord::Migrator.get_all_versions
+
+      return nil if version == versions.first
+
+      previous_value(values, version)
+    end
+
+    # TODO: consider combining code with that from old_migration_adapter.rb
+    def previous_value(arr, value)
+      arr.sort.select { |v| v < value }.last
+    end
 
     def base_paths
       ActiveRecord::Tasks::DatabaseTasks.migrations_paths
