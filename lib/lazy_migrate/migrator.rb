@@ -16,9 +16,9 @@ module LazyMigrate
 
       def create_migration_adapter
         if Rails.version > '5.2.0'
-          NewMigrationAdapter.new
+          LazyMigrate::NewMigrationAdapter.new
         else
-          OldMigrationAdapater.new
+          LazyMigrate::OldMigrationAdapater.new
         end
       end
 
