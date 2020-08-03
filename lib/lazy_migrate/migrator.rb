@@ -104,6 +104,7 @@ module LazyMigrate
               with_unsafe_error_capture do
                 option_map[option].(migration)
               end
+              dump_schema
               prompt_any_key(prompt)
               on_done.()
             })
@@ -184,6 +185,16 @@ module LazyMigrate
       rescue Exception => e # rubocop:disable Lint/RescueException
         # I am aware you should not rescue 'Exception' exceptions but I think this is is an 'exceptional' use case
         puts "\n#{e.class}: #{e.message}\n#{e.backtrace.take(5).join("\n")}"
+      end
+
+      def dump_schema
+        return if !ActiveRecord::Base.dump_schema_after_migration
+
+        # ripped from https://github.com/rails/rails/blob/5-1-stable/activerecord/lib/active_record/railties/databases.rake
+        filename = ENV["SCHEMA"] || File.join(ActiveRecord::Tasks::DatabaseTasks.db_dir, "schema.rb")
+        File.open(filename, "w:utf-8") do |file|
+          ActiveRecord::SchemaDumper.dump(ActiveRecord::Base.connection, file)
+        end
       end
     end
   end
