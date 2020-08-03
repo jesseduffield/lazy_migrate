@@ -149,9 +149,9 @@ module LazyMigrate
         }#{
           migration[:version].to_s.ljust(16)
         }#{
-          migration[:name].ljust(50)
-        }#{
           (migration[:current] ? '(current)' : '').ljust(12)
+        }#{
+          migration[:name].ljust(50)
         }"
       end
 
