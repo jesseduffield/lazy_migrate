@@ -6,6 +6,4 @@ RSpec::Core::RakeTask.new(:spec)
 
 task default: :spec
 
-task :run do
-  LazyMigrate.run
-end
+import "./lib/tasks/lazy_migrate.rake"
