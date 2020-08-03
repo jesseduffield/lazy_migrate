@@ -4,7 +4,8 @@
 until File.exist?('Gemfile')
   Dir.chdir('..')
 
-  if File.dirname(__FILE__) == __FILE__
+  at_root = Dir.getwd == File.dirname(Dir.getwd)
+  if at_root
     puts "Must be run in a rails project"
     exit
   end
