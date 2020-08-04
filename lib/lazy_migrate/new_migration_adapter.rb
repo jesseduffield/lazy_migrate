@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'lazy_migrate/common'
+require 'lazy_migrate/migration_adapter'
 
 module LazyMigrate
   class NewMigrationAdapter < MigrationAdapter

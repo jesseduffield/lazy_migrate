@@ -3,7 +3,7 @@
 require 'tty-prompt'
 require 'active_record'
 require 'rails'
-require "lazy_migrate/migration_adapter_factory"
+require 'lazy_migrate/migration_adapter_factory'
 
 module LazyMigrate
   class Migrator
@@ -96,8 +96,12 @@ module LazyMigrate
           REDO => ->(migration) { migration_adapter.redo(migration[:version]) },
           MIGRATE => ->(migration) { migration_adapter.migrate(migration[:version]) },
           ROLLBACK => ->(migration) { migration_adapter.rollback(migration[:version]) },
-          BRING_TO_TOP => ->(migration) { migration_adapter.bring_to_top(migration: migration) },
+          BRING_TO_TOP => ->(migration) { migration_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { ask_for_rerun }) },
         }
+      end
+
+      def ask_for_rerun
+        prompt.yes?('Migration has been run. Would you like to `down` the migration before moving it, and then run it again after?')
       end
 
       def render_migration_option(migration)

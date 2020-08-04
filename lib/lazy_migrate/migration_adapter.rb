@@ -1,9 +1,7 @@
 # frozen_string_literal: true
 
-require 'lazy_migrate/common'
-
 module LazyMigrate
-  class MigrationAdapater
+  class MigrationAdapter
     def initialize
       raise 'MigrationAdapater is an abstract class, do not initialize it directly'
     end
@@ -13,7 +11,7 @@ module LazyMigrate
     # new migration file as upped as well. The former version number will be
     # removed from the schema_migrations table. The user chooses whether
     # they want to down the migration before moving it.
-    def bring_to_top(migration:)
+    def bring_to_top(migration:, ask_for_rerun:)
       initial_version = migration[:version]
       initial_status = migration[:status]
       initial_filename = self.find_filename_for_migration(migration)
@@ -22,8 +20,7 @@ module LazyMigrate
         raise("No file found for migration #{initial_version}")
       end
 
-      re_run = initial_status == 'up' &&
-               prompt.yes?('Migration has been run. Would you like to `down` the migration before moving it, and then run it again after?')
+      re_run = initial_status == 'up' && ask_for_rerun.()
 
       if re_run
         self.down(initial_version)
