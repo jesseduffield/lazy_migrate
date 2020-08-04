@@ -172,13 +172,11 @@ module LazyMigrate
         new_filename = replace_version_in_filename(filename, new_version)
         File.rename(filename, new_filename)
 
-        if initial_status == 'up'
-          if re_run
-            migration_adapter.up({ status: 'down', version: new_version, filename: new_filename })
-          else
-            ActiveRecord::SchemaMigration.create(version: new_version)
-            ActiveRecord::SchemaMigration.find_by(version: migration[:version])&.destroy!
-          end
+        if re_run
+          migration_adapter.up({ status: 'down', version: new_version, filename: new_filename })
+        elsif initial_status == 'up'
+          ActiveRecord::SchemaMigration.create(version: new_version)
+          ActiveRecord::SchemaMigration.find_by(version: migration[:version])&.destroy!
         end
       end
 
