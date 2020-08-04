@@ -3,9 +3,7 @@
 require 'lazy_migrate/common'
 
 module LazyMigrate
-  class NewMigrationAdapter
-    include LazyMigrate::Common
-
+  class NewMigrationAdapter < MigrationAdapter
     attr_accessor :context
 
     def initialize

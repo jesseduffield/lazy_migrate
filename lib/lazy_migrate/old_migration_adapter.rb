@@ -3,9 +3,7 @@
 require 'lazy_migrate/common'
 
 module LazyMigrate
-  class OldMigrationAdapater
-    include LazyMigrate::Common
-
+  class OldMigrationAdapater < MigrationAdapter
     # example: ['up', 20200715030339, 'Add unique index to table']
     def find_migration_tuples
       ActiveRecord::Migrator.migrations_status(base_paths)
