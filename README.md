@@ -22,20 +22,20 @@ Or install it yourself as:
 
 From within a rails console, go
 
-```
+```ruby
 LazyMigrate.run
 ```
 
 You can also invoke lazy_migrate as a rake task either by adding the following to your Rails app Rakefile:
 
-```
+```ruby
 spec = Gem::Specification.find_by_name('lazy_migrate')
 load "#{spec.gem_dir}/lib/tasks/lazy_migrate.rake"
 ```
 
 Or by creating a rake task yourself like so:
 
-```
+```ruby
 # in lib/tasks/lazy_migrate.rake
 # frozen_string_literal: true
 
