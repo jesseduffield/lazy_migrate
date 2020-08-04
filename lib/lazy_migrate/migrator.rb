@@ -170,7 +170,7 @@ module LazyMigrate
         end
 
         last = migration_adapter.last_version
-        new_version = ActiveRecord::Migration.next_migration_number(last ? last + 1 : 0)
+        new_version = ActiveRecord::Migration.next_migration_number(last ? last + 1 : 0).to_i
         new_filename = replace_version_in_filename(filename, new_version)
         File.rename(filename, new_filename)
 
@@ -197,7 +197,7 @@ module LazyMigrate
         yield
       rescue Exception => e # rubocop:disable Lint/RescueException
         # I am aware you should not rescue 'Exception' exceptions but I think this is is an 'exceptional' use case
-        puts "\n#{e.class}: #{e.message}\n#{e.backtrace.take(5).join("\n")}"
+        puts "\n#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
       end
 
       def dump_schema
