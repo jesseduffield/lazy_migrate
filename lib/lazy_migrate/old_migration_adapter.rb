@@ -11,30 +11,30 @@ module LazyMigrate
       ActiveRecord::Migrator.migrations_status(base_paths)
     end
 
-    def up(migration)
-      ActiveRecord::Migrator.run(:up, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, migration[:version])
+    def up(version)
+      ActiveRecord::Migrator.run(:up, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, version)
     end
 
-    def down(migration)
-      ActiveRecord::Migrator.run(:down, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, migration[:version])
+    def down(version)
+      ActiveRecord::Migrator.run(:down, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, version)
     end
 
-    def redo(migration)
-      down(migration)
-      up(migration)
+    def redo(version)
+      down(version)
+      up(version)
     end
 
-    def migrate(migration)
-      ActiveRecord::Migrator.migrate(base_paths, migration[:version])
+    def migrate(version)
+      ActiveRecord::Migrator.migrate(base_paths, version)
     end
 
-    def rollback(migration)
-      previous_version = find_previous_version(migration[:version])
+    def rollback(version)
+      previous_version = find_previous_version(version)
 
       if previous_version.nil?
         # rails excludes the given version when calling .migrate so we need to
         # just down this instead
-        down(migration)
+        down(version)
       else
         ActiveRecord::Migrator.migrate(base_paths, previous_version)
       end

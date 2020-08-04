@@ -128,11 +128,11 @@ module LazyMigrate
 
       def obtain_option_map(migration_adapter:)
         {
-          UP => ->(migration) { migration_adapter.up(migration) },
-          DOWN => ->(migration) { migration_adapter.down(migration) },
-          REDO => ->(migration) { migration_adapter.redo(migration) },
-          MIGRATE => ->(migration) { migration_adapter.migrate(migration) },
-          ROLLBACK => ->(migration) { migration_adapter.rollback(migration) },
+          UP => ->(migration) { migration_adapter.up(migration[:version]) },
+          DOWN => ->(migration) { migration_adapter.down(migration[:version]) },
+          REDO => ->(migration) { migration_adapter.redo(migration[:version]) },
+          MIGRATE => ->(migration) { migration_adapter.migrate(migration[:version]) },
+          ROLLBACK => ->(migration) { migration_adapter.rollback(migration[:version]) },
           BRING_TO_TOP => ->(migration) { bring_to_top(migration: migration, migration_adapter: migration_adapter) },
         }
       end
@@ -155,30 +155,31 @@ module LazyMigrate
       # removed from the schema_migrations table. The user chooses whether
       # they want to down the migration before moving it.
       def bring_to_top(migration:, migration_adapter:)
+        initial_version = migration[:version]
         initial_status = migration[:status]
-        filename = migration_adapter.find_filename_for_migration(migration)
+        initial_filename = migration_adapter.find_filename_for_migration(migration)
 
-        if filename.nil?
-          raise("No file found for migration #{migration[:version]}")
+        if initial_filename.nil?
+          raise("No file found for migration #{initial_version}")
         end
 
         re_run = initial_status == 'up' &&
                  prompt.yes?('Migration has been run. Would you like to `down` the migration before moving it, and then run it again after?')
 
         if re_run
-          migration_adapter.down(migration)
+          migration_adapter.down(initial_version)
         end
 
         last = migration_adapter.last_version
         new_version = ActiveRecord::Migration.next_migration_number(last ? last + 1 : 0).to_i
-        new_filename = replace_version_in_filename(filename, new_version)
-        File.rename(filename, new_filename)
+        new_filename = replace_version_in_filename(initial_filename, new_version)
+        File.rename(initial_filename, new_filename)
 
         if re_run
-          migration_adapter.up({ status: 'down', version: new_version, filename: new_filename })
+          migration_adapter.up(new_version)
         elsif initial_status == 'up'
           ActiveRecord::SchemaMigration.create(version: new_version)
-          ActiveRecord::SchemaMigration.find_by(version: migration[:version])&.destroy!
+          ActiveRecord::SchemaMigration.find_by(version: initial_version)&.destroy!
         end
       end
 
@@ -197,7 +198,7 @@ module LazyMigrate
         yield
       rescue Exception => e # rubocop:disable Lint/RescueException
         # I am aware you should not rescue 'Exception' exceptions but I think this is is an 'exceptional' use case
-        puts "\n#{e.class}: #{e.message}\n#{e.backtrace.join("\n")}"
+        puts "\n#{e.class}: #{e.message}\n#{e.backtrace.take(5).join("\n")}"
       end
 
       def dump_schema

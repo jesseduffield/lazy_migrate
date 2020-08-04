@@ -19,33 +19,33 @@ module LazyMigrate
       context.migrations_status
     end
 
-    def up(migration)
-      context.run(:up, migration[:version])
+    def up(version)
+      context.run(:up, version)
     end
 
-    def down(migration)
-      context.run(:down, migration[:version])
+    def down(version)
+      context.run(:down, version)
     end
 
-    def redo(migration)
-      down(migration)
-      up(migration)
+    def redo(version)
+      down(version)
+      up(version)
     end
 
-    def migrate(migration)
-      context.up(migration[:version])
+    def migrate(version)
+      context.up(version)
     end
 
-    def rollback(migration)
+    def rollback(version)
       # for some reason in https://github.com/rails/rails/blob/5-2-stable/activerecord/lib/active_record/migration.rb#L1221
       # we stop before the selected version. I have no idea why.
 
-      previous_version = find_previous_version(migration[:version])
+      previous_version = find_previous_version(version)
 
       if previous_version.nil?
         # rails excludes the given version when calling .down so we need to
         # just down this instead
-        down(migration)
+        down(version)
       else
         context.down(previous_version)
       end
