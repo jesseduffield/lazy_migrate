@@ -94,7 +94,6 @@ module LazyMigrate
       def select_action_prompt(on_done:, migration_adapter:, migration:)
         if !migration[:has_file]
           prompt.error("\nMigration file not found for migration #{migration[:version]}")
-          prompt_any_key
           on_done.()
         end
 
@@ -107,7 +106,6 @@ module LazyMigrate
                 option_map[option].(migration)
               end
               dump_schema
-              prompt_any_key
               on_done.()
             })
           end
@@ -188,10 +186,6 @@ module LazyMigrate
         dir = File.dirname(filename)
         new_basename = "#{new_version}_#{basename.split('_')[1..].join('_')}"
         File.join(dir, new_basename)
-      end
-
-      def prompt_any_key
-        prompt.keypress("\nPress any key to continue")
       end
 
       def with_unsafe_error_capture
