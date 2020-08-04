@@ -160,11 +160,8 @@ module LazyMigrate
           raise("No file found for migration #{migration[:version]}")
         end
 
-        re_run = if initial_status == 'up'
-          prompt.yes?('Migration has been run. Would you like to `down` the migration before moving it, and then run it again after?')
-        else
-          false
-        end
+        re_run = initial_status == 'up' &&
+                 prompt.yes?('Migration has been run. Would you like to `down` the migration before moving it, and then run it again after?')
 
         if re_run
           migration_adapter.down(migration)
@@ -173,7 +170,6 @@ module LazyMigrate
         last = migration_adapter.last_version
         new_version = ActiveRecord::Migration.next_migration_number(last ? last + 1 : 0)
         new_filename = replace_version_in_filename(filename, new_version)
-
         File.rename(filename, new_filename)
 
         if initial_status == 'up'
