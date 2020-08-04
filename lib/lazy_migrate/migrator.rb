@@ -150,30 +150,47 @@ module LazyMigrate
       # bring_to_top updates the version of a migration to bring it to the top of the
       # migration list. If the migration had already been up'd it will mark the
       # new migration file as upped as well. The former version number will be
-      # removed from the schema_migrations table.
+      # removed from the schema_migrations table. The user chooses whether
+      # they want to down the migration before moving it.
       def bring_to_top(migration:, migration_adapter:)
+        initial_status = migration[:status]
         filename = migration_adapter.find_filename_for_migration(migration)
 
         if filename.nil?
           raise("No file found for migration #{migration[:version]}")
         end
 
+        re_run = if initial_status == 'up'
+          prompt.yes?('Migration has been run. Would you like to `down` the migration before moving it, and then run it again after?')
+        else
+          false
+        end
+
+        if re_run
+          migration_adapter.down(migration)
+        end
+
         last = migration_adapter.last_version
         new_version = ActiveRecord::Migration.next_migration_number(last ? last + 1 : 0)
-
-        # replace the version
-        basename = File.basename(filename)
-        dir = File.dirname(filename)
-        new_basename = "#{new_version}_#{basename.split('_')[1..].join('_')}"
-        new_filename = File.join(dir, new_basename)
+        new_filename = replace_version_in_filename(filename, new_version)
 
         File.rename(filename, new_filename)
 
-        if migration[:status] == 'up'
-          ActiveRecord::SchemaMigration.create(version: new_version)
+        if initial_status == 'up'
+          if re_run
+            migration_adapter.up({ status: 'down', version: new_version, filename: new_filename })
+          else
+            ActiveRecord::SchemaMigration.create(version: new_version)
+            ActiveRecord::SchemaMigration.find_by(version: migration[:version])&.destroy!
+          end
         end
+      end
 
-        ActiveRecord::SchemaMigration.find_by(version: migration[:version])&.destroy!
+      def replace_version_in_filename(filename, new_version)
+        basename = File.basename(filename)
+        dir = File.dirname(filename)
+        new_basename = "#{new_version}_#{basename.split('_')[1..].join('_')}"
+        File.join(dir, new_basename)
       end
 
       def prompt_any_key(prompt)
