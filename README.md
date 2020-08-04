@@ -1,8 +1,6 @@
 # LazyMigrate
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/lazy_migrate`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Easily manage rails migrations with a mini UI that can be invoked in your console or on the command line.
 
 ## Installation
 
@@ -14,7 +12,7 @@ gem 'lazy_migrate'
 
 And then execute:
 
-    $ bundle
+    $ bundle install
 
 Or install it yourself as:
 
@@ -28,7 +26,7 @@ From within a rails console, go
 LazyMigrate.run
 ```
 
-You can also invoke lazy_migrate as a rake task either by adding the following to your Rakefile:
+You can also invoke lazy_migrate as a rake task either by adding the following to your Rails app Rakefile:
 
 ```
 spec = Gem::Specification.find_by_name('lazy_migrate')
@@ -60,7 +58,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/lazy_migrate.
+Bug reports and pull requests are welcome on GitHub at https://github.com/jesseduffield/lazy_migrate.
 
 ## License
 
