@@ -25,10 +25,9 @@ module LazyMigrate
             load_migration_paths
             migrations = find_migrations(migration_adapter)
 
-            prompt = TTY::Prompt.new(active_color: :bright_green)
             prompt.ok("\nDatabase: #{ActiveRecord::Base.connection_config[:database]}\n")
 
-            select_migration_prompt(prompt: prompt, migrations: migrations, on_done: on_done, migration_adapter: migration_adapter)
+            select_migration_prompt(migrations: migrations, on_done: on_done, migration_adapter: migration_adapter)
           end
         end
       rescue TTY::Reader::InputInterrupt
@@ -36,6 +35,10 @@ module LazyMigrate
       end
 
       private
+
+      def prompt
+        TTY::Prompt.new(active_color: :bright_green)
+      end
 
       def find_migrations(migration_adapter)
         current_version = migration_adapter.last_version
@@ -69,7 +72,7 @@ module LazyMigrate
         end
       end
 
-      def select_migration_prompt(prompt:, migrations:, on_done:, migration_adapter:)
+      def select_migration_prompt(migrations:, on_done:, migration_adapter:)
         prompt.select('Pick a migration') do |menu|
           migrations.each { |migration|
             name = render_migration_option(migration)
@@ -79,7 +82,6 @@ module LazyMigrate
               -> {
                 select_action_prompt(
                   on_done: on_done,
-                  prompt: prompt,
                   migration_adapter: migration_adapter,
                   migration: migration,
                 )
@@ -89,10 +91,10 @@ module LazyMigrate
         end
       end
 
-      def select_action_prompt(on_done:, migration_adapter:, prompt:, migration:)
+      def select_action_prompt(on_done:, migration_adapter:, migration:)
         if !migration[:has_file]
           prompt.error("\nMigration file not found for migration #{migration[:version]}")
-          prompt_any_key(prompt)
+          prompt_any_key
           on_done.()
         end
 
@@ -105,7 +107,7 @@ module LazyMigrate
                 option_map[option].(migration)
               end
               dump_schema
-              prompt_any_key(prompt)
+              prompt_any_key
               on_done.()
             })
           end
@@ -187,7 +189,7 @@ module LazyMigrate
         File.join(dir, new_basename)
       end
 
-      def prompt_any_key(prompt)
+      def prompt_any_key
         prompt.keypress("\nPress any key to continue")
       end
 
