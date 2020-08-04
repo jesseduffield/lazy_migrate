@@ -208,6 +208,6 @@ module LazyMigrate
   end
 
   def self.run
-    Migrator.show
+    Migrator.run
   end
 end
