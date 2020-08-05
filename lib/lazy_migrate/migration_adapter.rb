@@ -3,7 +3,7 @@
 module LazyMigrate
   class MigrationAdapter
     def initialize
-      raise 'MigrationAdapater is an abstract class, do not initialize it directly'
+      raise 'MigrationAdapter is an abstract class, do not initialize it directly'
     end
 
     # bring_to_top updates the version of a migration to bring it to the top of the

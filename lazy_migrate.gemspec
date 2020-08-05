@@ -34,7 +34,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rails", "~> 5.2.4"
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency 'sqlite3'
+  spec.add_development_dependency 'sqlite3', '~> 1.4.2'
 
   spec.add_runtime_dependency 'tty-prompt', '~> 0.22.0'
 end

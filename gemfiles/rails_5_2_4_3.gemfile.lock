@@ -166,7 +166,7 @@ DEPENDENCIES
   rails (= 5.2.4.3)
   rake (~> 13.0)
   rspec (~> 3.0)
-  sqlite3
+  sqlite3 (~> 1.4.2)
 
 BUNDLED WITH
    2.0.2

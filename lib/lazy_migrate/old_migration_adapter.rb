@@ -3,7 +3,11 @@
 require 'lazy_migrate/migration_adapter'
 
 module LazyMigrate
-  class OldMigrationAdapater < MigrationAdapter
+  class OldMigrationAdapter < MigrationAdapter
+    def initialize
+      # no-op but preventing parent initialize from being called
+    end
+
     # example: ['up', 20200715030339, 'Add unique index to table']
     def find_migration_tuples
       ActiveRecord::Migrator.migrations_status(base_paths)

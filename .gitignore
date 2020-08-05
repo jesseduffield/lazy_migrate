@@ -10,4 +10,5 @@
 # rspec failure tracking
 .rspec_status
 
+spec/support/rails_app_5_1/db/*
 spec/support/rails_app_5_2/db/*

@@ -31,7 +31,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
     ]
   }
 
-  let(:migration_adapter) { LazyMigrate::NewMigrationAdapter.new }
+  let(:migration_adapter) { LazyMigrate::MigrationAdapterFactory.create_migration_adapter }
 
   let(:new_version) { 30900804234040 }
 
@@ -200,7 +200,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
 
       migration_adapter.dump_schema
 
-      expect(File.read(schema_file)).to include('4020_08_04_234040')
+      expect(File.read(schema_file)).to match(/4020_08_04_234040|40200804234040/)
     end
   end
 
@@ -225,19 +225,41 @@ RSpec.describe LazyMigrate::MigrationAdapter do
 
     subject { migration_adapter.migrate(add_page_count_migration_status[:version]) }
 
-    it 'migrates up to and including migration' do
-      expect { subject }
-        .to change { ActiveRecord::SchemaMigration.all.map(&:version) }
-        .from([
-          create_books_migration_status[:version],
-          add_rating_migration_status[:version],
-        ])
-        .to([
-          create_books_migration_status[:version],
-          add_rating_migration_status[:version],
-          add_author_migration_status[:version],
-          add_page_count_migration_status[:version],
-        ])
+    context 'when rails version is 5.1' do
+      next unless Rails.version.start_with?('5.1')
+
+      it 'migrates down to migration' do
+        expect { subject }
+          .to change { ActiveRecord::SchemaMigration.all.map(&:version) }
+          .from([
+            create_books_migration_status[:version],
+            add_rating_migration_status[:version],
+          ])
+          .to([
+            # interestingly in 5.2+ we actually migrate 'downwards' if referring to
+            # an old migration, equivalent to rolling back
+            create_books_migration_status[:version],
+          ])
+      end
+    end
+
+    context 'when rails version is 5.2' do
+      next unless Rails.version.start_with?('5.2')
+
+      it 'migrates up to and including migration' do
+        expect { subject }
+          .to change { ActiveRecord::SchemaMigration.all.map(&:version) }
+          .from([
+            create_books_migration_status[:version],
+            add_rating_migration_status[:version],
+          ])
+          .to([
+            create_books_migration_status[:version],
+            add_rating_migration_status[:version],
+            add_author_migration_status[:version],
+            add_page_count_migration_status[:version],
+          ])
+      end
     end
   end
 
