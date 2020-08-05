@@ -9,11 +9,6 @@ module LazyMigrate
       # no-op but preventing parent initialize from being called
     end
 
-    # example: ['up', 20200715030339, 'Add unique index to table']
-    def find_migration_tuples
-      ActiveRecord::Migrator.migrations_status(base_paths)
-    end
-
     def up(version)
       ActiveRecord::Migrator.run(:up, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, version)
     end
@@ -44,6 +39,11 @@ module LazyMigrate
     end
 
     protected
+
+    # example: [['up', '20200715030339', 'Add unique index to table']]
+    def find_migration_tuples
+      ActiveRecord::Migrator.migrations_status(base_paths)
+    end
 
     def find_previous_version(version)
       versions = ActiveRecord::Migrator.get_all_versions

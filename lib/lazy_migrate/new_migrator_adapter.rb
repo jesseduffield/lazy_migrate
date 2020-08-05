@@ -2,39 +2,44 @@
 # frozen_string_literal: true
 
 require 'lazy_migrate/migrator_adapter'
+require 'lazy_migrate/migration'
 
 module LazyMigrate
   class NewMigratorAdapter < MigratorAdapter
+    extend T::Sig
+
+    sig { returns(ActiveRecord::MigrationContext) }
     attr_accessor :context
 
+    sig { void }
     def initialize
       # TODO: consider making this a method rather than an instance variable
       # considering how cheap it is to obtain
       @context = ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate'))
     end
 
-    # example: ['up', 20200715030339, 'Add unique index to table']
-    def find_migration_tuples
-      context.migrations_status
-    end
-
+    sig { params(version: Integer).void }
     def up(version)
       context.run(:up, version)
     end
 
+    sig { params(version: Integer).void }
     def down(version)
       context.run(:down, version)
     end
 
+    sig { params(version: Integer).void }
     def redo(version)
       down(version)
       up(version)
     end
 
+    sig { params(version: Integer).void }
     def migrate(version)
       context.up(version)
     end
 
+    sig { params(version: Integer).void }
     def rollback(version)
       # for some reason in https://github.com/rails/rails/blob/5-2-stable/activerecord/lib/active_record/migration.rb#L1221
       # we stop before the selected version. I have no idea why.
@@ -52,6 +57,13 @@ module LazyMigrate
 
     protected
 
+    # example: [['up', '20200715030339', 'Add unique index to table']]
+    sig { returns(T::Array[String]) }
+    def find_migration_tuples
+      context.migrations_status
+    end
+
+    sig { params(version: Integer).returns(T.nilable(Integer)) }
     def find_previous_version(version)
       versions = context.migrations.map(&:version)
 
@@ -60,10 +72,12 @@ module LazyMigrate
       previous_value(versions, version)
     end
 
+    sig { params(migration: LazyMigrate::Migration).returns(T.nilable(String)) }
     def find_filename_for_migration(migration)
       context.migrations.find { |m| m.version == migration.version }&.filename
     end
 
+    sig { returns(T.nilable(Integer)) }
     def last_version
       context.migrations.last&.version
     end
