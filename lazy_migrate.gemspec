@@ -35,6 +35,8 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 13.0"
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency 'sqlite3', '~> 1.4.2'
+  spec.add_development_dependency 'sorbet'
 
+  spec.add_runtime_dependency 'sorbet-runtime'
   spec.add_runtime_dependency 'tty-prompt', '~> 0.22.0'
 end
