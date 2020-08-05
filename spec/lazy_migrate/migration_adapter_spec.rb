@@ -1,3 +1,4 @@
+# typed: false
 # frozen_string_literal: true
 
 require 'rails_helper'
@@ -50,11 +51,6 @@ RSpec.describe LazyMigrate::MigrationAdapter do
     migrate_dir = File.join(db_dir, 'migrate')
     FileUtils.rm_rf(migrate_dir)
     FileUtils.cp_r(File.join(support_folder, 'mock_migrations/default/.'), migrate_dir)
-
-    # does the db exist?
-    if !File.exist?(File.join(db_dir, 'test.sqlite3'))
-      ActiveRecord::Migrations.create
-    end
 
     ActiveRecord::Migration.drop_table(:books) if ActiveRecord::Base.connection.table_exists?(:books)
     ActiveRecord::Migration.create_table "books", force: :cascade do |t|

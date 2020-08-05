@@ -1,3 +1,4 @@
+# typed: true
 # frozen_string_literal: true
 
 require "lazy_migrate/old_migration_adapter"

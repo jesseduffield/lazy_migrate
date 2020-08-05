@@ -1,3 +1,4 @@
+# typed: strict
 class AddBookRating < ActiveRecord::Migration[5.1]
   def up
     add_column :books, :rating, :integer
