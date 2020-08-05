@@ -38,6 +38,16 @@ module LazyMigrate
       end
     end
 
+    protected
+
+    def find_previous_version(version)
+      versions = ActiveRecord::Migrator.get_all_versions
+
+      return nil if version == versions.first
+
+      previous_value(versions, version)
+    end
+
     def find_filename_for_migration(migration)
       migrations.find { |m| m.version == migration[:version] }&.filename
     end
@@ -47,14 +57,6 @@ module LazyMigrate
     end
 
     private
-
-    def find_previous_version(version)
-      versions = ActiveRecord::Migrator.get_all_versions
-
-      return nil if version == versions.first
-
-      previous_value(versions, version)
-    end
 
     def base_paths
       ActiveRecord::Tasks::DatabaseTasks.migrations_paths

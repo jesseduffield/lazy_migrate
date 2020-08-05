@@ -49,6 +49,8 @@ module LazyMigrate
       end
     end
 
+    protected
+
     def find_previous_version(version)
       versions = context.migrations.map(&:version)
 
