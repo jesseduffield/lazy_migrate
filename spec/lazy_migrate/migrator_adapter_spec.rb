@@ -8,20 +8,20 @@ RSpec.describe LazyMigrate::MigratorAdapter do
   let(:rails_root) { Rails.root }
 
   let(:create_books_migration_status) {
-    LazyMigrate::Migration.new(*{ status: "up", version: 20200804231712, name: "Create books", has_file: true, current: false }.values)
+    LazyMigrate::Migration.new(status: "up", version: 20200804231712, name: "Create books", has_file: true, current: false)
   }
 
   let(:add_author_migration_status_status) { 'up' }
   let(:add_author_migration_status) {
-    LazyMigrate::Migration.new(*{ status: add_author_migration_status_status, version: 20200804234040, name: "Add book author", has_file: true, current: false }.values)
+    LazyMigrate::Migration.new(status: add_author_migration_status_status, version: 20200804234040, name: "Add book author", has_file: true, current: false)
   }
 
   let(:add_page_count_migration_status) {
-    LazyMigrate::Migration.new(*{ status: "down", version: 20200804234057, name: "Add book page count", has_file: true, current: false }.values)
+    LazyMigrate::Migration.new(status: "down", version: 20200804234057, name: "Add book page count", has_file: true, current: false)
   }
 
   let(:add_rating_migration_status) {
-    LazyMigrate::Migration.new(*{ status: "up", version: 20200804234111, name: "Add book rating", has_file: true, current: true }.values)
+    LazyMigrate::Migration.new(status: "up", version: 20200804234111, name: "Add book rating", has_file: true, current: true)
   }
 
   let(:migrations) {
@@ -71,7 +71,9 @@ RSpec.describe LazyMigrate::MigratorAdapter do
 
   describe '.find_migrations' do
     it "finds migrations" do
-      expect(migrator_adapter.find_migrations).to eq(migrations)
+      expect(migrator_adapter.find_migrations.map(&:serialize)).to eq(
+        migrations.map(&:serialize)
+      )
     end
   end
 

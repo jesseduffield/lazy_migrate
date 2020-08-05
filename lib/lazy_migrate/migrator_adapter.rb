@@ -73,13 +73,11 @@ module LazyMigrate
           current = version == current_version
 
           LazyMigrate::Migration.new(
-            *{
-              status: status,
-              version: version,
-              name: name,
-              has_file: has_file,
-              current: current,
-            }.values
+            status: status,
+            version: version,
+            name: name,
+            has_file: has_file,
+            current: current,
           )
         }
     end
