@@ -1,5 +1,5 @@
 PATH
-  remote: .
+  remote: ..
   specs:
     lazy_migrate (0.1.5)
       tty-prompt (~> 0.22.0)
@@ -163,7 +163,7 @@ DEPENDENCIES
   bundler (~> 2.0)
   lazy_migrate!
   pry-byebug (~> 3.9.0)
-  rails (~> 5.2.4)
+  rails (= 5.2.4.3)
   rake (~> 13.0)
   rspec (~> 3.0)
   sqlite3

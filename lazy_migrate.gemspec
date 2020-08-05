@@ -28,6 +28,7 @@ Gem::Specification.new do |spec|
   spec.executables   = ['lazy_migrate']
   spec.require_paths = ["lib"]
 
+  spec.add_development_dependency "appraisal"
   spec.add_development_dependency "bundler", "~> 2.0"
   spec.add_development_dependency 'pry-byebug', '~> 3.9.0'
   spec.add_development_dependency "rails", "~> 5.2.4"
