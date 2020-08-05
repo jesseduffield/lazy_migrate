@@ -1,10 +1,10 @@
 # typed: false
 # frozen_string_literal: true
 
-require 'lazy_migrate/migration_adapter'
+require 'lazy_migrate/migrator_adapter'
 
 module LazyMigrate
-  class OldMigrationAdapter < MigrationAdapter
+  class OldMigratorAdapter < MigratorAdapter
     def initialize
       # no-op but preventing parent initialize from being called
     end

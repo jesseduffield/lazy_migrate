@@ -2,9 +2,9 @@
 # frozen_string_literal: true
 
 module LazyMigrate
-  class MigrationAdapter
+  class MigratorAdapter
     def initialize
-      raise 'MigrationAdapter is an abstract class, do not initialize it directly'
+      raise 'MigratorAdapter is an abstract class, do not initialize it directly'
     end
 
     # bring_to_top updates the version of a migration to bring it to the top of the

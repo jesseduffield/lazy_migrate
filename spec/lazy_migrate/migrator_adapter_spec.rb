@@ -3,7 +3,7 @@
 
 require 'rails_helper'
 
-RSpec.describe LazyMigrate::MigrationAdapter do
+RSpec.describe LazyMigrate::MigratorAdapter do
   let(:rails_root) { Rails.root }
 
   let(:create_books_migration_status) {
@@ -32,7 +32,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
     ]
   }
 
-  let(:migration_adapter) { LazyMigrate::MigrationAdapterFactory.create_migration_adapter }
+  let(:migrator_adapter) { LazyMigrate::MigratorAdapterFactory.create_migrator_adapter }
 
   let(:new_version) { 30900804234040 }
 
@@ -70,14 +70,14 @@ RSpec.describe LazyMigrate::MigrationAdapter do
 
   describe '.find_migrations' do
     it "finds migrations" do
-      expect(migration_adapter.find_migrations).to eq(migrations)
+      expect(migrator_adapter.find_migrations).to eq(migrations)
     end
   end
 
   describe '.replace_version_in_filename' do
     let(:filename) { '20200804231712_create_books.rb' }
 
-    subject { migration_adapter.replace_version_in_filename(filename, new_version) }
+    subject { migrator_adapter.replace_version_in_filename(filename, new_version) }
 
     it { is_expected.to eq "./#{new_version}_create_books.rb" }
   end
@@ -86,7 +86,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
     let(:migration) { add_author_migration_status }
     let(:rerun) { false }
 
-    subject { migration_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { rerun }) }
+    subject { migrator_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { rerun }) }
 
     before do
       expect(ActiveRecord::Migration).to receive(:next_migration_number).with(add_rating_migration_status[:version] + 1).and_return(new_version.to_s)
@@ -181,7 +181,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
 
       FileUtils.cp(File.join(support_folder, 'mock_migrations/20200804235555_add_book_weight.rb'), migrate_dir)
 
-      migration_adapter.load_migration_paths
+      migrator_adapter.load_migration_paths
 
       # confirming that it's defined
       expect { AddBookWeight }.not_to raise_error
@@ -194,7 +194,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
 
       ActiveRecord::SchemaMigration.create(version: 4020_08_04_234040)
 
-      migration_adapter.dump_schema
+      migrator_adapter.dump_schema
 
       expect(File.read(schema_file)).to match(/4020_08_04_234040|40200804234040/)
     end
@@ -202,7 +202,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
 
   describe '.up' do
     it 'ups a migration' do
-      migration_adapter.up(add_page_count_migration_status[:version])
+      migrator_adapter.up(add_page_count_migration_status[:version])
 
       expect(ActiveRecord::SchemaMigration.find_by(version: add_author_migration_status[:version])).to be_present
     end
@@ -210,7 +210,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
 
   describe '.down' do
     it 'downs a migration' do
-      migration_adapter.down(add_author_migration_status[:version])
+      migrator_adapter.down(add_author_migration_status[:version])
 
       expect(ActiveRecord::SchemaMigration.find_by(version: add_author_migration_status[:version])).to be nil
     end
@@ -219,7 +219,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
   describe '.migrate' do
     let(:add_author_migration_status_status) { 'down' }
 
-    subject { migration_adapter.migrate(add_page_count_migration_status[:version]) }
+    subject { migrator_adapter.migrate(add_page_count_migration_status[:version]) }
 
     context 'when rails version is 5.1' do
       next unless Rails.version.start_with?('5.1')
@@ -262,7 +262,7 @@ RSpec.describe LazyMigrate::MigrationAdapter do
   describe '.rollback' do
     let(:add_author_migration_status_status) { 'up' }
 
-    subject { migration_adapter.rollback(add_author_migration_status[:version]) }
+    subject { migrator_adapter.rollback(add_author_migration_status[:version]) }
 
     it 'rolls back to before migration' do
       expect { subject }

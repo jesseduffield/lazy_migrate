@@ -1,10 +1,10 @@
 # typed: true
 # frozen_string_literal: true
 
-require 'lazy_migrate/migration_adapter'
+require 'lazy_migrate/migrator_adapter'
 
 module LazyMigrate
-  class NewMigrationAdapter < MigrationAdapter
+  class NewMigratorAdapter < MigratorAdapter
     attr_accessor :context
 
     def initialize
