@@ -1,6 +1,8 @@
 # typed: false
 # frozen_string_literal: true
 
+require 'lazy_migrate/migration'
+
 module LazyMigrate
   class MigratorAdapter
     def initialize
@@ -13,8 +15,8 @@ module LazyMigrate
     # removed from the schema_migrations table. The user chooses whether
     # they want to down the migration before moving it.
     def bring_to_top(migration:, ask_for_rerun:)
-      initial_version = migration[:version]
-      initial_status = migration[:status]
+      initial_version = migration.version
+      initial_status = migration.status
       initial_filename = self.find_filename_for_migration(migration)
 
       if initial_filename.nil?
@@ -70,13 +72,15 @@ module LazyMigrate
           version = str_version.to_i
           current = version == current_version
 
-          {
-            status: status,
-            version: version,
-            name: name,
-            has_file: has_file,
-            current: current,
-          }
+          LazyMigrate::Migration.new(
+            *{
+              status: status,
+              version: version,
+              name: name,
+              has_file: has_file,
+              current: current,
+            }.values
+          )
         }
     end
 

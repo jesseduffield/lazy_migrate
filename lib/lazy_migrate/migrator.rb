@@ -58,15 +58,15 @@ module LazyMigrate
       end
 
       def select_action_prompt(on_done:, migrator_adapter:, migration:)
-        if !migration[:has_file]
-          prompt.error("\nMigration file not found for migration #{migration[:version]}")
+        if !migration.has_file
+          prompt.error("\nMigration file not found for migration #{migration.version}")
           on_done.()
         end
 
         option_map = obtain_option_map(migrator_adapter: migrator_adapter)
 
-        prompt.select("\nWhat would you like to do for #{migration[:version]} #{name}?") do |inner_menu|
-          options_for_migration(status: migration[:status]).each do |option|
+        prompt.select("\nWhat would you like to do for #{migration.version} #{name}?") do |inner_menu|
+          options_for_migration(status: migration.status).each do |option|
             inner_menu.choice(option, -> {
               with_unsafe_error_capture do
                 option_map[option].(migration)
@@ -92,11 +92,11 @@ module LazyMigrate
 
       def obtain_option_map(migrator_adapter:)
         {
-          UP => ->(migration) { migrator_adapter.up(migration[:version]) },
-          DOWN => ->(migration) { migrator_adapter.down(migration[:version]) },
-          REDO => ->(migration) { migrator_adapter.redo(migration[:version]) },
-          MIGRATE => ->(migration) { migrator_adapter.migrate(migration[:version]) },
-          ROLLBACK => ->(migration) { migrator_adapter.rollback(migration[:version]) },
+          UP => ->(migration) { migrator_adapter.up(migration.version) },
+          DOWN => ->(migration) { migrator_adapter.down(migration.version) },
+          REDO => ->(migration) { migrator_adapter.redo(migration.version) },
+          MIGRATE => ->(migration) { migrator_adapter.migrate(migration.version) },
+          ROLLBACK => ->(migration) { migrator_adapter.rollback(migration.version) },
           BRING_TO_TOP => ->(migration) { migrator_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { ask_for_rerun }) },
         }
       end
@@ -107,13 +107,13 @@ module LazyMigrate
 
       def render_migration_option(migration)
         "#{
-          migration[:status].ljust(6)
+          migration.status.ljust(6)
         }#{
-          migration[:version].to_s.ljust(16)
+          migration.version.to_s.ljust(16)
         }#{
-          (migration[:current] ? 'current' : '').ljust(9)
+          (migration.current ? 'current' : '').ljust(9)
         }#{
-          migration[:name].ljust(50)
+          migration.name.ljust(50)
         }"
       end
 

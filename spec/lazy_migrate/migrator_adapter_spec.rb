@@ -2,25 +2,26 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'lazy_migrate/migration'
 
 RSpec.describe LazyMigrate::MigratorAdapter do
   let(:rails_root) { Rails.root }
 
   let(:create_books_migration_status) {
-    { status: "up", version: 20200804231712, name: "Create books", has_file: true, current: false }
+    LazyMigrate::Migration.new(*{ status: "up", version: 20200804231712, name: "Create books", has_file: true, current: false }.values)
   }
 
   let(:add_author_migration_status_status) { 'up' }
   let(:add_author_migration_status) {
-    { status: add_author_migration_status_status, version: 20200804234040, name: "Add book author", has_file: true, current: false }
+    LazyMigrate::Migration.new(*{ status: add_author_migration_status_status, version: 20200804234040, name: "Add book author", has_file: true, current: false }.values)
   }
 
   let(:add_page_count_migration_status) {
-    { status: "down", version: 20200804234057, name: "Add book page count", has_file: true, current: false }
+    LazyMigrate::Migration.new(*{ status: "down", version: 20200804234057, name: "Add book page count", has_file: true, current: false }.values)
   }
 
   let(:add_rating_migration_status) {
-    { status: "up", version: 20200804234111, name: "Add book rating", has_file: true, current: true }
+    LazyMigrate::Migration.new(*{ status: "up", version: 20200804234111, name: "Add book rating", has_file: true, current: true }.values)
   }
 
   let(:migrations) {
@@ -61,9 +62,9 @@ RSpec.describe LazyMigrate::MigratorAdapter do
 
     ActiveRecord::SchemaMigration.delete_all
 
-    migrations.sort { |m| m[:version] }.each do |migration|
-      if migration[:status] == 'up'
-        ActiveRecord::SchemaMigration.create(version: migration[:version])
+    migrations.sort { |m| m.version }.each do |migration|
+      if migration.status == 'up'
+        ActiveRecord::SchemaMigration.create(version: migration.version)
       end
     end
   end
@@ -89,7 +90,7 @@ RSpec.describe LazyMigrate::MigratorAdapter do
     subject { migrator_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { rerun }) }
 
     before do
-      expect(ActiveRecord::Migration).to receive(:next_migration_number).with(add_rating_migration_status[:version] + 1).and_return(new_version.to_s)
+      expect(ActiveRecord::Migration).to receive(:next_migration_number).with(add_rating_migration_status.version + 1).and_return(new_version.to_s)
     end
 
     shared_examples 'renames file' do
@@ -126,8 +127,8 @@ RSpec.describe LazyMigrate::MigratorAdapter do
 
       it 'does not change schema migration table' do
         expect { subject }.not_to(change { ActiveRecord::SchemaMigration.all.map(&:version) }.from([
-          create_books_migration_status[:version],
-          add_rating_migration_status[:version],
+          create_books_migration_status.version,
+          add_rating_migration_status.version,
         ]))
       end
     end
@@ -140,13 +141,13 @@ RSpec.describe LazyMigrate::MigratorAdapter do
           expect { subject }
             .to change { ActiveRecord::SchemaMigration.all.map(&:version) }
             .from([
-              create_books_migration_status[:version],
-              add_author_migration_status[:version],
-              add_rating_migration_status[:version],
+              create_books_migration_status.version,
+              add_author_migration_status.version,
+              add_rating_migration_status.version,
             ])
             .to([
-              create_books_migration_status[:version],
-              add_rating_migration_status[:version],
+              create_books_migration_status.version,
+              add_rating_migration_status.version,
               new_version,
             ])
         end
@@ -202,24 +203,24 @@ RSpec.describe LazyMigrate::MigratorAdapter do
 
   describe '.up' do
     it 'ups a migration' do
-      migrator_adapter.up(add_page_count_migration_status[:version])
+      migrator_adapter.up(add_page_count_migration_status.version)
 
-      expect(ActiveRecord::SchemaMigration.find_by(version: add_author_migration_status[:version])).to be_present
+      expect(ActiveRecord::SchemaMigration.find_by(version: add_author_migration_status.version)).to be_present
     end
   end
 
   describe '.down' do
     it 'downs a migration' do
-      migrator_adapter.down(add_author_migration_status[:version])
+      migrator_adapter.down(add_author_migration_status.version)
 
-      expect(ActiveRecord::SchemaMigration.find_by(version: add_author_migration_status[:version])).to be nil
+      expect(ActiveRecord::SchemaMigration.find_by(version: add_author_migration_status.version)).to be nil
     end
   end
 
   describe '.migrate' do
     let(:add_author_migration_status_status) { 'down' }
 
-    subject { migrator_adapter.migrate(add_page_count_migration_status[:version]) }
+    subject { migrator_adapter.migrate(add_page_count_migration_status.version) }
 
     context 'when rails version is 5.1' do
       next unless Rails.version.start_with?('5.1')
@@ -228,13 +229,13 @@ RSpec.describe LazyMigrate::MigratorAdapter do
         expect { subject }
           .to change { ActiveRecord::SchemaMigration.all.map(&:version) }
           .from([
-            create_books_migration_status[:version],
-            add_rating_migration_status[:version],
+            create_books_migration_status.version,
+            add_rating_migration_status.version,
           ])
           .to([
             # interestingly in 5.2+ we actually migrate 'downwards' if referring to
             # an old migration, equivalent to rolling back
-            create_books_migration_status[:version],
+            create_books_migration_status.version,
           ])
       end
     end
@@ -246,14 +247,14 @@ RSpec.describe LazyMigrate::MigratorAdapter do
         expect { subject }
           .to change { ActiveRecord::SchemaMigration.all.map(&:version) }
           .from([
-            create_books_migration_status[:version],
-            add_rating_migration_status[:version],
+            create_books_migration_status.version,
+            add_rating_migration_status.version,
           ])
           .to([
-            create_books_migration_status[:version],
-            add_rating_migration_status[:version],
-            add_author_migration_status[:version],
-            add_page_count_migration_status[:version],
+            create_books_migration_status.version,
+            add_rating_migration_status.version,
+            add_author_migration_status.version,
+            add_page_count_migration_status.version,
           ])
       end
     end
@@ -262,18 +263,18 @@ RSpec.describe LazyMigrate::MigratorAdapter do
   describe '.rollback' do
     let(:add_author_migration_status_status) { 'up' }
 
-    subject { migrator_adapter.rollback(add_author_migration_status[:version]) }
+    subject { migrator_adapter.rollback(add_author_migration_status.version) }
 
     it 'rolls back to before migration' do
       expect { subject }
         .to change { ActiveRecord::SchemaMigration.all.map(&:version) }
         .from([
-          create_books_migration_status[:version],
-          add_author_migration_status[:version],
-          add_rating_migration_status[:version],
+          create_books_migration_status.version,
+          add_author_migration_status.version,
+          add_rating_migration_status.version,
         ])
         .to([
-          create_books_migration_status[:version],
+          create_books_migration_status.version,
         ])
     end
   end

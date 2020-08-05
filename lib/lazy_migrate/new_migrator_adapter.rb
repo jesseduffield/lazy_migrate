@@ -61,7 +61,7 @@ module LazyMigrate
     end
 
     def find_filename_for_migration(migration)
-      context.migrations.find { |m| m.version == migration[:version] }&.filename
+      context.migrations.find { |m| m.version == migration.version }&.filename
     end
 
     def last_version
