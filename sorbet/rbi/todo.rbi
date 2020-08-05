@@ -9,7 +9,6 @@ module ::Anonymous_Delegator_15; end
 module ::Anonymous_Delegator_16; end
 module ::Anonymous_Delegator_3; end
 module ::Spring; end
-module ActiveRecord::Migrations; end
 module ActiveStorage::Blob::Analyzable; end
 module ActiveStorage::Blob::Identifiable; end
 module ActiveStorage::Variant; end
