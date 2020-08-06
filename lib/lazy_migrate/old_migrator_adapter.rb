@@ -3,6 +3,15 @@
 
 require 'lazy_migrate/migrator_adapter'
 
+module ActiveRecord
+  class Migrator
+    module Compatibility
+      class V5_1 < ActiveRecord::Migrator
+      end
+    end
+  end
+end
+
 module LazyMigrate
   class OldMigratorAdapter < MigratorAdapter
     extend T::Sig
@@ -14,12 +23,12 @@ module LazyMigrate
 
     sig { override.params(version: Integer).void }
     def up(version)
-      ActiveRecord::Migrator.run(:up, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, version)
+      ActiveRecord::Migrator::Compatibility::V5_1.run(:up, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, version)
     end
 
     sig { override.params(version: Integer).void }
     def down(version)
-      ActiveRecord::Migrator.run(:down, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, version)
+      ActiveRecord::Migrator::Compatibility::V5_1.run(:down, ActiveRecord::Tasks::DatabaseTasks.migrations_paths, version)
     end
 
     sig { override.params(version: Integer).void }
@@ -30,7 +39,7 @@ module LazyMigrate
 
     sig { override.params(version: Integer).void }
     def migrate(version)
-      ActiveRecord::Migrator.migrate(base_paths, version)
+      ActiveRecord::Migrator::Compatibility::V5_1.migrate(base_paths, version)
     end
 
     sig { override.params(version: Integer).void }
@@ -42,7 +51,7 @@ module LazyMigrate
         # just down this instead
         down(version)
       else
-        ActiveRecord::Migrator.migrate(base_paths, previous_version)
+        ActiveRecord::Migrator::Compatibility::V5_1.migrate(base_paths, previous_version)
       end
     end
 
@@ -51,12 +60,12 @@ module LazyMigrate
     # example: [['up', '20200715030339', 'Add unique index to table']]
     sig { override.returns(T::Array[[String, String, String]]) }
     def find_migration_tuples
-      ActiveRecord::Migrator.migrations_status(base_paths)
+      ActiveRecord::Migrator::Compatibility::V5_1.migrations_status(base_paths)
     end
 
     sig { override.params(version: Integer).returns(T.nilable(Integer)) }
     def find_previous_version(version)
-      versions = ActiveRecord::Migrator.get_all_versions
+      versions = ActiveRecord::Migrator::Compatibility::V5_1.get_all_versions
 
       return nil if version == versions.first
 
@@ -70,7 +79,7 @@ module LazyMigrate
 
     sig { override.returns(T.nilable(Integer)) }
     def last_version
-      ActiveRecord::Migrator.get_all_versions.last
+      ActiveRecord::Migrator::Compatibility::V5_1.get_all_versions.last
     end
 
     private
@@ -82,12 +91,12 @@ module LazyMigrate
 
     sig { returns(T::Array[String]) }
     def migration_files
-      ActiveRecord::Migrator.migration_files(base_paths)
+      ActiveRecord::Migrator::Compatibility::V5_1.migration_files(base_paths)
     end
 
     sig { returns(T::Array[ActiveRecord::MigrationProxy]) }
     def migrations
-      ActiveRecord::Migrator.migrations(base_paths)
+      ActiveRecord::Migrator::Compatibility::V5_1.migrations(base_paths)
     end
   end
 end
