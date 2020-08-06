@@ -7,7 +7,7 @@ module LazyMigrate
   class OldMigratorAdapter < MigratorAdapter
     extend T::Sig
 
-    sig { override.void }
+    sig { void }
     def initialize
       # no-op but preventing parent initialize from being called
     end
