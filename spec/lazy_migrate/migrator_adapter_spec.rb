@@ -92,7 +92,7 @@ RSpec.describe LazyMigrate::MigratorAdapter do
     subject { migrator_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { rerun }) }
 
     before do
-      expect(ActiveRecord::Migration).to receive(:next_migration_number).with(add_rating_migration_status.version + 1).and_return(new_version.to_s)
+      expect_any_instance_of(ActiveRecord::Migration).to receive(:next_migration_number).with(add_rating_migration_status.version + 1).and_return(new_version.to_s)
     end
 
     shared_examples 'renames file' do

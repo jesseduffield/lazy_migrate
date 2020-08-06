@@ -35,7 +35,7 @@ module LazyMigrate
       end
 
       last = self.last_version
-      new_version = ActiveRecord::Migration.next_migration_number(last ? last + 1 : 0).to_i
+      new_version = ActiveRecord::Migration.new.next_migration_number(last ? last + 1 : 0).to_i
       new_filename = replace_version_in_filename(initial_filename, new_version)
       File.rename(initial_filename, new_filename)
 
