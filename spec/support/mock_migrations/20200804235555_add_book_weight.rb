@@ -1,4 +1,4 @@
-# typed: true
+# typed: false
 class AddBookWeight < ActiveRecord::Migration[5.1]
   def up
     add_column :books, :weight, :integer
