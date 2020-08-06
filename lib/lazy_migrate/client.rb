@@ -7,7 +7,7 @@ require 'rails'
 require 'lazy_migrate/migrator_adapter_factory'
 
 module LazyMigrate
-  class Migrator
+  class Client
     class << self
       MIGRATE = 'migrate'
       ROLLBACK = 'rollback'
@@ -59,50 +59,45 @@ module LazyMigrate
 
       def select_action_prompt(on_done:, migrator_adapter:, migration:)
         if !migration.has_file
-          prompt.error("\nMigration file not found for migration #{migration.version}")
+          prompt.select("\nFile not found for migration version.") do |menu|
+            menu.choice('remove version from version table', -> { migrator_adapter.remove_version_from_table(migration.version) })
+            menu.choice('cancel', -> {})
+          end
           on_done.()
         end
 
-        option_map = obtain_option_map(migrator_adapter: migrator_adapter)
+        option_map = obtain_option_map(migrator_adapter: migrator_adapter, on_done: on_done)
 
-        prompt.select("\nWhat would you like to do for #{migration.version} #{name}?") do |inner_menu|
-          options_for_migration(status: migration.status).each do |option|
-            inner_menu.choice(option, -> {
-              with_unsafe_error_capture do
-                option_map[option].(migration)
-              end
+        prompt.select("\nWhat would you like to do for #{migration.version} #{name}?") do |menu|
+          option_map.each do |label, on_press|
+            menu.choice(label, -> {
+              with_unsafe_error_capture { on_press.(migration) }
               migrator_adapter.dump_schema
               on_done.()
             })
           end
 
-          inner_menu.choice('cancel', on_done)
+          menu.choice('cancel', on_done)
         end
       end
 
-      def options_for_migration(status:)
-        common_options = [MIGRATE, ROLLBACK, BRING_TO_TOP]
-        specific_options = if status == 'up'
-          [DOWN, REDO]
-        else
-          [UP]
-        end
-        specific_options + common_options
-      end
-
-      def obtain_option_map(migrator_adapter:)
+      def obtain_option_map(migrator_adapter:, on_done:)
         {
+          MIGRATE => ->(migration) { migrator_adapter.migrate(migration.version) },
+          ROLLBACK => ->(migration) { migrator_adapter.rollback(migration.version) },
           UP => ->(migration) { migrator_adapter.up(migration.version) },
           DOWN => ->(migration) { migrator_adapter.down(migration.version) },
           REDO => ->(migration) { migrator_adapter.redo(migration.version) },
-          MIGRATE => ->(migration) { migrator_adapter.migrate(migration.version) },
-          ROLLBACK => ->(migration) { migrator_adapter.rollback(migration.version) },
-          BRING_TO_TOP => ->(migration) { migrator_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { ask_for_rerun }) },
+          BRING_TO_TOP => ->(migration) { migrator_adapter.bring_to_top(migration: migration, ask_for_rerun: -> { ask_for_rerun(on_done) }) },
         }
       end
 
-      def ask_for_rerun
-        prompt.yes?('Migration has been run. Would you like to `down` the migration before moving it, and then run it again after?')
+      def ask_for_rerun(on_done)
+        prompt.select("\nMigration has been run. Would you like to `down` the migration before moving it, and then run it again after?") do |menu|
+          menu.choice('yes, down and re-run the migration', -> { true })
+          menu.choice('no, just bump the version without migrating anything', -> { false })
+          menu.choice('cancel', -> { on_done.() })
+        end
       end
 
       def render_migration_option(migration)
@@ -113,7 +108,7 @@ module LazyMigrate
         }#{
           (migration.current ? 'current' : '').ljust(9)
         }#{
-          migration.name.ljust(50)
+          migration.name
         }"
       end
 
@@ -121,12 +116,8 @@ module LazyMigrate
         yield
       rescue Exception => e # rubocop:disable Lint/RescueException
         # I am aware you should not rescue 'Exception' exceptions but I think this is is an 'exceptional' use case
-        puts "\n#{e.class}: #{e.message}\n#{e.backtrace.take(5).join("\n")}"
+        prompt.error("\n#{e.class}: #{e.message}\n#{e.backtrace.take(5).join("\n")}")
       end
     end
-  end
-
-  def self.run
-    Migrator.run
   end
 end

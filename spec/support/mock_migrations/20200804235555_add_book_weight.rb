@@ -5,6 +5,6 @@ class AddBookWeight < ActiveRecord::Migration[5.1]
   end
 
   def down
-    remove_column :books, :weight, :integer
+    remove_column :books, :weight
   end
 end

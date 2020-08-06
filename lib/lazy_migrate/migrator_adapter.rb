@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 require 'lazy_migrate/migration'
@@ -105,6 +105,11 @@ module LazyMigrate
     sig { params(arr: T::Array[Integer], value: Integer).returns(T.nilable(Integer)) }
     def previous_value(arr, value)
       arr.sort.select { |v| v < value }.last
+    end
+
+    sig { params(version: Integer).void }
+    def remove_version_from_table(version)
+      ActiveRecord::SchemaMigration.find_by!(version: version).destroy!
     end
 
     sig { abstract.params(version: Integer).void }

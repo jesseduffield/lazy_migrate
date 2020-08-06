@@ -2,10 +2,10 @@
 # frozen_string_literal: true
 
 require "lazy_migrate/version"
-require "lazy_migrate/migrator"
+require "lazy_migrate/client"
 
 module LazyMigrate
   def self.run
-    Migrator.run
+    Client.run
   end
 end

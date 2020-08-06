@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 require 'lazy_migrate/migrator_adapter'
@@ -15,11 +15,6 @@ end
 module LazyMigrate
   class OldMigratorAdapter < MigratorAdapter
     extend T::Sig
-
-    sig { void }
-    def initialize
-      # no-op but preventing parent initialize from being called
-    end
 
     sig { override.params(version: Integer).void }
     def up(version)

@@ -1,4 +1,4 @@
-# typed: true
+# typed: strict
 # frozen_string_literal: true
 
 require 'lazy_migrate/migrator_adapter'
@@ -15,7 +15,7 @@ module LazyMigrate
     def initialize
       # TODO: consider making this a method rather than an instance variable
       # considering how cheap it is to obtain
-      @context = ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate'))
+      @context = T.let(ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate')), ActiveRecord::MigrationContext)
     end
 
     sig { override.params(version: Integer).void }
