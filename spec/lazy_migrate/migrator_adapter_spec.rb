@@ -69,6 +69,13 @@ RSpec.describe LazyMigrate::MigratorAdapter do
     end
   end
 
+  after do
+    db_dir = ActiveRecord::Tasks::DatabaseTasks.db_dir
+
+    FileUtils.rm(File.join(db_dir, 'schema.rb'))
+    FileUtils.rm_rf(File.join(db_dir, 'migrate'))
+  end
+
   describe '.find_migrations' do
     it "finds migrations" do
       expect(migrator_adapter.find_migrations.map(&:serialize)).to eq(
