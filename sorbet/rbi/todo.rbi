@@ -12,5 +12,7 @@ module ::Spring; end
 module ActiveStorage::Blob::Analyzable; end
 module ActiveStorage::Blob::Identifiable; end
 module ActiveStorage::Variant; end
-module T::CompatibilityPatches::RSpecCompatibility::MethodDoubleExtensions; end
-module T::CompatibilityPatches::RSpecCompatibility::RecorderExtensions; end
+module T::InterfaceWrapper::Helpers; end
+module T::Private::Abstract::Hooks; end
+module T::Private::Methods::MethodHooks; end
+module T::Private::Methods::SingletonMethodHooks; end

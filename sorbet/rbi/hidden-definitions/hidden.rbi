@@ -2074,9 +2074,6 @@ module ActiveRecord::AttributeMethods::PrimaryKey::ClassMethods
   ID_ATTRIBUTE_METHODS = ::T.let(nil, ::T.untyped)
 end
 
-class ActiveRecord::AttributeMethods::TimeZoneConversion::TimeZoneConverter
-end
-
 class ActiveRecord::Base
   include ::GlobalID::Identification
 end
@@ -2168,9 +2165,6 @@ end
 
 class ActiveRecord::FixtureSet
   MAX_ID = ::T.let(nil, ::T.untyped)
-end
-
-class ActiveRecord::Locking::LockingType
 end
 
 class ActiveRecord::LogSubscriber
@@ -2585,9 +2579,6 @@ ActiveRecord::Type::Float = ActiveModel::Type::Float
 ActiveRecord::Type::Helpers = ActiveModel::Type::Helpers
 
 ActiveRecord::Type::Integer = ActiveModel::Type::Integer
-
-class ActiveRecord::Type::Serialized
-end
 
 class ActiveRecord::Type::Time::Value
 end
@@ -6659,6 +6650,17 @@ class KeyError
   include ::DidYouMean::Correctable
 end
 
+class LazyMigrate::Migration
+  def self.inherited(s); end
+end
+
+class LazyMigrate::MigratorAdapter
+  extend ::T::Private::Abstract::Hooks
+  extend ::T::InterfaceWrapper::Helpers
+  extend ::T::Private::Methods::MethodHooks
+  extend ::T::Private::Methods::SingletonMethodHooks
+end
+
 class Logger
   SEV_LABEL = ::T.let(nil, ::T.untyped)
 end
@@ -9102,10 +9104,6 @@ class RSpec::Mocks::AnyInstance::PositiveExpectationChain
   ExpectationInvocationOrder = ::T.let(nil, ::T.untyped)
 end
 
-class RSpec::Mocks::AnyInstance::Recorder
-  include ::T::CompatibilityPatches::RSpecCompatibility::RecorderExtensions
-end
-
 class RSpec::Mocks::AnyInstance::StubChain
   EmptyInvocationOrder = ::T.let(nil, ::T.untyped)
   InvocationOrder = ::T.let(nil, ::T.untyped)
@@ -9119,10 +9117,6 @@ class RSpec::Mocks::Matchers::HaveReceived
   ARGS_CONSTRAINTS = ::T.let(nil, ::T.untyped)
   CONSTRAINTS = ::T.let(nil, ::T.untyped)
   COUNT_CONSTRAINTS = ::T.let(nil, ::T.untyped)
-end
-
-class RSpec::Mocks::MethodDouble
-  include ::T::CompatibilityPatches::RSpecCompatibility::MethodDoubleExtensions
 end
 
 class RSpec::Mocks::ObjectReference

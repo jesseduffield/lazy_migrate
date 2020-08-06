@@ -3465,6 +3465,7 @@
 # wrong constant name require
 # uninitialized constant LUSolve
 # uninitialized constant LUSolve
+# wrong constant name inherited
 # uninitialized constant Logger::LogDevice::SiD
 # wrong constant name <Class:Address>
 # wrong constant name <Class:AddressList>
@@ -6497,7 +6498,7 @@
 # uninitialized constant Rails::Generators::TestCase::VERSION
 # wrong constant name properties
 # wrong constant name properties=
-# undefined singleton method `property<defaultArg>1' for `#<Module:0x00007ff980b91320>'
+# undefined singleton method `property<defaultArg>1' for `#<Module:0x00007ffa23e838f0>'
 # wrong constant name <static-init>
 # wrong constant name properties
 # wrong constant name properties=
