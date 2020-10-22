@@ -5,3 +5,9 @@ cache: bundler
 rvm:
   - 2.6.3
 before_install: gem install bundler -v 2.0.2
+gemfile:
+  - gemfiles/rails_5_1_5.gemfile
+  - gemfiles/rails_5_2_4_3.gemfile
+  - gemfiles/rails_6_0_3_4.gemfile
+matrix:
+  fast_finish: true
