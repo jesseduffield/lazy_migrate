@@ -15,7 +15,12 @@ module LazyMigrate
     def initialize
       # TODO: consider making this a method rather than an instance variable
       # considering how cheap it is to obtain
-      @context = T.let(ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate')), ActiveRecord::MigrationContext)
+      @context = T.let(
+        ActiveRecord::MigrationContext.instance_method(:initialize).arity == 2 ?
+          ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate'), ActiveRecord::SchemaMigration) :
+          ActiveRecord::MigrationContext.new(Rails.root.join('db', 'migrate')),
+        ActiveRecord::MigrationContext,
+      )
     end
 
     sig { override.params(version: Integer).void }

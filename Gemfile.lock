@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    lazy_migrate (0.1.5)
+    lazy_migrate (0.2.0)
       sorbet-runtime
       tty-prompt (~> 0.22.0)
 
@@ -131,7 +131,7 @@ GEM
     rspec-support (3.9.3)
     sorbet (0.5.5862)
       sorbet-static (= 0.5.5862)
-    sorbet-runtime (0.5.5862)
+    sorbet-runtime (0.5.5991)
     sorbet-static (0.5.5862-universal-darwin-14)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
@@ -143,7 +143,7 @@ GEM
     sqlite3 (1.4.2)
     thor (1.0.1)
     thread_safe (0.3.6)
-    tty-color (0.5.1)
+    tty-color (0.5.2)
     tty-cursor (0.7.1)
     tty-prompt (0.22.0)
       pastel (~> 0.8)
@@ -175,4 +175,4 @@ DEPENDENCIES
   sqlite3 (~> 1.4.2)
 
 BUNDLED WITH
-   2.0.2
+   2.1.4
