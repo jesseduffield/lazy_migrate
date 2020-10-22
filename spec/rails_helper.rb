@@ -8,6 +8,7 @@ require "support/rails_app_#{version_underlined}/config/environment"
 
 support_folder = File.join(File.dirname(__FILE__), 'support')
 db_dir = ActiveRecord::Tasks::DatabaseTasks.db_dir
+FileUtils.mkdir_p(db_dir)
 schema_filename = File.join(db_dir, 'schema.rb')
 FileUtils.cp(File.join(support_folder, 'mock_schema.rb'), schema_filename)
 
