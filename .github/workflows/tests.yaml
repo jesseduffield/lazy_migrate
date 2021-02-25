@@ -8,7 +8,7 @@ on:
       - 'README.md'
   push:
     branches:
-      - master
+      - '**'
     paths-ignore:
       - 'README.md'
 
@@ -16,28 +16,18 @@ jobs:
   unit_tests:
     name: Unit Tests
     if: "contains(github.event.commits[0].message, '[ci skip]') == false"
-    strategy:
-      fail-fast: false
-      matrix:
-        os:
-          - ubuntu
-        ruby:
-          - 2.6
-        gemfile:
-          - gemfiles/rails_5_1_5.gemfile
-          - gemfiles/rails_5_2_4_3.gemfile
-          - gemfiles/rails_6_0_3_4.gemfile
-    env:
-      BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
-    runs-on: ${{ matrix.os }}-latest
+    runs-on: ubuntu-latest
     continue-on-error: ${{ endsWith(matrix.ruby, 'head') || matrix.ruby == 'debug' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
+      # - name: Setup Ruby
+      #   uses: ruby/setup-ruby@v1
+      #   with:
+      #     ruby-version: ${{ matrix.ruby }}
+      #     bundler-cache: true
       - name: Test
-        run: bundle exec rake spec
+        run: |
+          bundle install
+          bundle exec appraisal install
+          bundle exec appraisal rspec
