@@ -74,8 +74,8 @@ We use [Appraisal](https://github.com/thoughtbot/appraisal) to test the gem agai
 ```
 bundle exec appraisal
 
-bundle exec appraisal rails-5-1-5 rspec
-bundle exec appraisal rails-5-2-4-3 install
+bundle exec appraisal rails_5_1_5 rspec
+bundle exec appraisal rails_5_2_4_3 install
 ```
 
 ## Contributing
