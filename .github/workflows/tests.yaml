@@ -15,19 +15,41 @@ on:
 jobs:
   unit_tests:
     name: Unit Tests
-    if: "contains(github.event.commits[0].message, '[ci skip]') == false"
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+        ruby:
+          - "2.7"
+        gemfile:
+          - gemfiles/rails_5_1.gemfile
+          - gemfiles/rails_6_0.gemfile
+          - gemfiles/rails_6_1.gemfile
+          - gemfiles/rails_7_0.gemfile
+        allow_failures:
+          - false
+        include:
+          - os: ubuntu-latest
+            ruby: "3.0"
+            gemfile: gemfiles/rails_7_0.gemfile
+            allow_failures: false
+          - os: ubuntu-latest
+            ruby: "3.1"
+            gemfile: gemfiles/rails_7_0.gemfile
+            allow_failures: false
+    env:
+      BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
+      ALLOW_FAILURES: "${{ matrix.allow_failures }}"
+    runs-on: ${{ matrix.os }}
     continue-on-error: ${{ endsWith(matrix.ruby, 'head') || matrix.ruby == 'debug' }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      # - name: Setup Ruby
-      #   uses: ruby/setup-ruby@v1
-      #   with:
-      #     ruby-version: ${{ matrix.ruby }}
-      #     bundler-cache: true
+        uses: actions/checkout@v3
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
       - name: Test
-        run: |
-          bundle install
-          bundle exec appraisal install
-          bundle exec appraisal rspec
+        run: bundle exec rake spec || $ALLOW_FAILURES

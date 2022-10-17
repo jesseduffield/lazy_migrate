@@ -1,5 +1,5 @@
 PATH
-  remote: .
+  remote: ..
   specs:
     lazy_migrate (0.3.0)
       sorbet-runtime
@@ -186,7 +186,7 @@ DEPENDENCIES
   bundler (~> 2.0)
   lazy_migrate!
   pry-byebug (~> 3.9.0)
-  rails (~> 6.0.3)
+  rails (~> 6.0.0)
   rake (~> 13.0)
   rspec (~> 3.0)
   sorbet
