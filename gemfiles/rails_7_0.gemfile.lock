@@ -108,6 +108,8 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.13.8-arm64-darwin)
       racc (~> 1.4)
+    nokogiri (1.13.8-x86_64-linux)
+      racc (~> 1.4)
     pastel (0.8.0)
       tty-color (~> 0.5)
     pry (0.13.1)
@@ -160,10 +162,11 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.11.0)
     rspec-support (3.11.1)
-    sorbet (0.5.10486)
-      sorbet-static (= 0.5.10486)
-    sorbet-runtime (0.5.10486)
-    sorbet-static (0.5.10486-universal-darwin-21)
+    sorbet (0.5.10488)
+      sorbet-static (= 0.5.10488)
+    sorbet-runtime (0.5.10488)
+    sorbet-static (0.5.10488-universal-darwin-21)
+    sorbet-static (0.5.10488-x86_64-linux)
     sqlite3 (1.4.4)
     thor (1.2.1)
     timeout (0.3.0)
@@ -187,6 +190,7 @@ GEM
 
 PLATFORMS
   arm64-darwin-21
+  x86_64-linux
 
 DEPENDENCIES
   appraisal
@@ -200,4 +204,4 @@ DEPENDENCIES
   sqlite3 (~> 1.4.2)
 
 BUNDLED WITH
-   2.2.3
+   2.3.23
