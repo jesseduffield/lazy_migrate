@@ -10,6 +10,5 @@
 # rspec failure tracking
 .rspec_status
 
-spec/support/rails_app_5_1_5/db/
-spec/support/rails_app_5_2_4_3/db/
+spec/support/rails_app_*/db/
 TODO.md

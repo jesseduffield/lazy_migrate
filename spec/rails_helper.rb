@@ -3,7 +3,7 @@
 
 require 'rails/all'
 # require 'rspec/rails'
-version_underlined = Rails.version.gsub('.', '_')
+version_underlined = Rails.version.gsub('.', '_').gsub(/(\d_\d)(_\d)+$/, '\1')
 require "support/rails_app_#{version_underlined}/config/environment"
 
 support_folder = File.join(File.dirname(__FILE__), 'support')
