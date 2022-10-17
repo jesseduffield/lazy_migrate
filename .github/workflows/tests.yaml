@@ -23,7 +23,6 @@ jobs:
         ruby:
           - "2.7"
         gemfile:
-          - gemfiles/rails_5_0.gemfile
           - gemfiles/rails_5_1.gemfile
           - gemfiles/rails_6_0.gemfile
           - gemfiles/rails_6_1.gemfile
@@ -39,10 +38,6 @@ jobs:
             ruby: "3.1"
             gemfile: gemfiles/rails_7_0.gemfile
             allow_failures: false
-          - os: ubuntu-latest
-            ruby: ruby-head
-            gemfile: gemfiles/rails_7_0.gemfile
-            allow_failures: true
     env:
       BUNDLE_GEMFILE: "${{ matrix.gemfile }}"
       ALLOW_FAILURES: "${{ matrix.allow_failures }}"
