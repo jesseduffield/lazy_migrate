@@ -101,7 +101,7 @@ GEM
     pry-byebug (3.9.0)
       byebug (~> 11.0)
       pry (~> 0.13.0)
-    rack (2.2.3)
+    rack (2.2.6.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
     rails (6.0.3.4)
@@ -147,13 +147,6 @@ GEM
     sorbet (0.5.6303)
       sorbet-static (= 0.5.6303)
     sorbet-runtime (0.5.6303)
-    sorbet-static (0.5.6303-universal-darwin-14)
-    sorbet-static (0.5.6303-universal-darwin-15)
-    sorbet-static (0.5.6303-universal-darwin-16)
-    sorbet-static (0.5.6303-universal-darwin-17)
-    sorbet-static (0.5.6303-universal-darwin-18)
-    sorbet-static (0.5.6303-universal-darwin-19)
-    sorbet-static (0.5.6303-universal-darwin-20)
     sorbet-static (0.5.6303-x86_64-linux)
     sprockets (4.0.2)
       concurrent-ruby (~> 1.0)
@@ -184,7 +177,7 @@ GEM
     zeitwerk (2.4.0)
 
 PLATFORMS
-  ruby
+  x86_64-linux
 
 DEPENDENCIES
   appraisal
