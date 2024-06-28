@@ -22,9 +22,13 @@ module LazyMigrate
         loop do
           catch(:done) do
             on_done = -> { throw :done }
+            database_name = if ActiveRecord::Base.respond_to?(:connection_db_config)
+              ActiveRecord::Base.connection_db_config.database # Rails 7
+            else
+              ActiveRecord::Base.connection_config[:database] # Rails 6-
+            end
 
-            prompt.ok("\nDatabase: #{ActiveRecord::Base.connection_config[:database]}\n")
-
+            prompt.ok("\nDatabase: #{database_name}\n")
             select_migration_prompt(on_done: on_done, migrator_adapter: migrator_adapter)
           end
         end

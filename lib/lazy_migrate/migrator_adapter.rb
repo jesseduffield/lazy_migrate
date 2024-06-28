@@ -58,7 +58,7 @@ module LazyMigrate
 
     sig { void }
     def dump_schema
-      return if !ActiveRecord::Base.dump_schema_after_migration
+      return if !ActiveRecord.dump_schema_after_migration
 
       # ripped from https://github.com/rails/rails/blob/5-1-stable/activerecord/lib/active_record/railties/databases.rake
       filename = ENV["SCHEMA"] || File.join(ActiveRecord::Tasks::DatabaseTasks.db_dir, "schema.rb")
